@@ -1,0 +1,16 @@
+MOTIVATION
+
+Running storage benchmarks inside of the emulator raise some concerns that time
+might not be reported correctly in the guest.  This benchmark is intended to be
+run on an Android device with time measurement done on the host.
+
+USAGE
+
+1) Start an x86 Android emulator
+   (must have at least 1024MB of free internal storage space)
+2) Disconnect any other devices/stop any other emulators
+3) ./android-bench.sh
+
+It is also possible to run this benchmark on Linux for comparison
+1) ./linux-bench.sh
+
