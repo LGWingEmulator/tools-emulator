@@ -154,7 +154,7 @@ for project in projectsHi:
     shaHi = project.get('revision')
     projectLo = rootLo.find("./project/[@path='{}']".format(path))
     if projectLo is None:
-        command += '*************** echo new project {} >> {}'.format(path, log)
+        command += 'echo ================== new project {} >> {} &&\n'.format(path, log)
     else:
         shaLo = projectLo.get('revision')
         if shaLo != shaHi:
