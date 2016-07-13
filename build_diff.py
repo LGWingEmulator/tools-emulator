@@ -2,10 +2,11 @@
 # Creates a combined git log of all changes between to repo manifests
 #
 #  Usage:
-# cd <path-to-emu-master-dev-repository>
+# cd <emulator-repo>/tools/emulator/
 # ./build_diff.py <build-id-a> <build-id-b>
 
 import apiclient
+import argparse
 import httplib2
 import io
 import oauth2client
@@ -16,6 +17,11 @@ import xml.etree.ElementTree
 from apiclient.discovery import build as googleapi
 from oauth2client import client
 from oauth2client import tools
+
+argparser = argparse.ArgumentParser(parents=[tools.argparser]);
+argparser.add_argument("build_lo")
+argparser.add_argument("build_hi")
+args = argparser.parse_args()
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -36,18 +42,22 @@ def get_credentials():
     SCOPES = 'https://www.googleapis.com/auth/androidbuild.internal'
 
     home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
+    credential_dir = os.path.join(home_dir, '.emu_build_diff')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'calendar-python-quickstart.json')
+    credential_path = os.path.join(credential_dir, 'credentials.json')
 
+    secret_path = os.path.join(credential_dir, CLIENT_SECRET_FILE)
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        if not os.path.exists(secret_path):
+            print '"{}" is missing.'.format(secret_path)
+            print 'Download it from go/emu-drive'
+            sys.exit(1)
+        flow = client.flow_from_clientsecrets(secret_path, SCOPES)
         flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store, flags)
+        credentials = tools.run_flow(flow, store, args)
         print('Storing credentials to ' + credential_path)
     return credentials
 
@@ -114,8 +124,8 @@ http = credentials.authorize(httplib2.Http())
 # https://developers.google.com/apis-explorer/#p/androidbuildinternal/v1/
 service = googleapi('androidbuildinternal', 'v1', http=http)
 
-build_lo = int(sys.argv[1])
-build_hi = int(sys.argv[2])
+build_lo = args.build_lo
+build_hi = args.build_hi
 
 branch_lo = get_branch_from_build_id(service, build_lo)
 branch_hi = get_branch_from_build_id(service, build_hi)
