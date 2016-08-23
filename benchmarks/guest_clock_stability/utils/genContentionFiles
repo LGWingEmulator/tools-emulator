@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Copyright 2016 The Android Open Source Project
+#
+# This software is licensed under the terms of the GNU General Public
+# License version 2, as published by the Free Software Foundation, and
+# may be copied, distributed, and modified under those terms.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# Generates the files used by benchmark module to generate contention
+
+# Get directory of script
+SCRPDIR="$(dirname "$(readlink -f "$0")")"
+
+# Get contention file directory
+CONTDIR="$(dirname "${SCRPDIR}")"/contention
+
+dd of="${CONTDIR}"/small.txt if=/dev/zero bs=1M count=7
+dd of="${CONTDIR}"/med.txt if=/dev/zero bs=1M count=19
+dd of="${CONTDIR}"/large.txt if=/dev/zero bs=1M count=37
